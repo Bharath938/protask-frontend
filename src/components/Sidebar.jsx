@@ -1,12 +1,22 @@
-import React from "react";
+import React, { useState, useContext } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { FiHome, FiList, FiCheckCircle, FiLogOut } from "react-icons/fi";
-import { useContext } from "react";
+import {
+  FiHome,
+  FiList,
+  FiCheckCircle,
+  FiLogOut,
+  FiMenu,
+} from "react-icons/fi";
 import { AuthContext } from "../context/AuthContext";
 
-const Sidebar = ({ handleTasksFiltration, setStatusFilter, setPage }) => {
+export default function Sidebar({
+  handleTasksFiltration,
+  setStatusFilter,
+  setPage,
+}) {
   const { setAuth } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem("auth");
@@ -14,61 +24,97 @@ const Sidebar = ({ handleTasksFiltration, setStatusFilter, setPage }) => {
     navigate("/");
   };
 
+  const handleNavClick = (filter, page) => {
+    handleTasksFiltration(filter, page);
+    setIsOpen(false); // close menu on nav click (mobile)
+  };
+
   return (
-    <div className="bg-gray-800 text-white min-h-screen w-60 p-4 flex flex-col space-y-4">
-      <h2 className="text-2xl font-bold mb-6">ProTask</h2>
+    <div>
+      {/* Top bar */}
+      <div className="flex items-center justify-between bg-gray-800 p-4 md:hidden">
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="text-white text-2xl"
+        >
+          <FiMenu />
+        </button>
+        <h2 className="text-xl text-white font-bold">ProTask</h2>
+      </div>
 
-      <NavLink
-        to="/dashboard"
-        className={({ isActive }) =>
-          `flex items-center space-x-2 hover:bg-gray-700 p-2 rounded ${
-            isActive ? "bg-gray-700" : ""
-          }`
-        }
-        onClick={() => {
-          setStatusFilter(null);
-          setPage(1);
-        }}
+      {/* Sidebar */}
+      <div
+        className={`fixed md:static top-0 left-0 h-full w-64 bg-gray-800 p-4 flex flex-col transform transition-transform duration-300 z-50 ${
+          isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        }`}
       >
-        <FiHome />
-        <span>Dashboard</span>
-      </NavLink>
+        {/* Close button on mobile */}
+        <div className="flex items-center justify-between mb-6 md:hidden">
+          <h2 className="text-2xl text-white font-bold">ProTask</h2>
+          <button
+            onClick={() => setIsOpen(false)}
+            className="text-white text-2xl"
+          >
+            ✕
+          </button>
+        </div>
 
-      <NavLink
-        to="/tasks"
-        className={({ isActive }) =>
-          `flex items-center space-x-2 hover:bg-gray-700 p-2 rounded ${
-            isActive ? "bg-gray-700" : ""
-          }`
-        }
-        onClick={() => handleTasksFiltration("Pending, In Progress", 1)}
-      >
-        <FiList />
-        <span>Tasks</span>
-      </NavLink>
+        {/* Desktop logo */}
+        <h2 className="text-2xl text-white font-bold mb-6 hidden md:block">
+          ProTask
+        </h2>
 
-      <NavLink
-        to="/completed"
-        className={({ isActive }) =>
-          `flex items-center space-x-2 hover:bg-gray-700 p-2 rounded ${
-            isActive ? "bg-gray-700" : ""
-          }`
-        }
-        onClick={() => handleTasksFiltration("Completed", 1)}
-      >
-        <FiCheckCircle />
-        <span>Completed</span>
-      </NavLink>
+        <NavLink
+          to="/dashboard"
+          className={({ isActive }) =>
+            `flex items-center space-x-2 p-2 rounded hover:bg-gray-700 ${
+              isActive ? "bg-gray-700" : ""
+            } text-white`
+          }
+          onClick={() => {
+            setStatusFilter(null);
+            setPage(1);
+            setIsOpen(false);
+          }}
+        >
+          <FiHome />
+          <span>Dashboard</span>
+        </NavLink>
 
-      <button
-        onClick={handleLogout}
-        className="flex items-center space-x-2 hover:bg-gray-700 p-2 rounded text-left cursor-pointer"
-      >
-        <FiLogOut />
-        <span>Logout</span>
-      </button>
+        <NavLink
+          to="/tasks"
+          className={({ isActive }) =>
+            `flex items-center space-x-2 p-2 rounded hover:bg-gray-700 ${
+              isActive ? "bg-gray-700" : ""
+            } text-white`
+          }
+          onClick={() => handleNavClick("Pending, In Progress", 1)}
+        >
+          <FiList />
+          <span>Tasks</span>
+        </NavLink>
+
+        <NavLink
+          to="/completed"
+          className={({ isActive }) =>
+            `flex items-center space-x-2 p-2 rounded hover:bg-gray-700 ${
+              isActive ? "bg-gray-700" : ""
+            } text-white`
+          }
+          onClick={() => handleNavClick("Completed", 1)}
+        >
+          <FiCheckCircle />
+          <span>Completed</span>
+        </NavLink>
+
+        <button
+          onClick={handleLogout}
+          className="flex items-center space-x-2 p-2 rounded hover:bg-gray-700 text-white mt-auto"
+        >
+          <FiLogOut />
+          <span>Logout</span>
+        </button>
+      </div>
     </div>
   );
-};
-
-export default Sidebar;
+}

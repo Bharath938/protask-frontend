@@ -44,7 +44,7 @@ const Dashboard = () => {
   } = useTasks();
 
   return (
-    <div className="flex h-screen bg-gray-900 text-white relative">
+    <div className="flex flex-col md:flex-row h-screen bg-gray-900 text-white relative">
       {loading && <Loader />}
       <div className="w-64 bg-gray-800 p-4 flex flex-col">
         <Sidebar
